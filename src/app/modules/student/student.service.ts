@@ -2,7 +2,8 @@ import { Student } from "./student.model";
 import { User } from "../user/user.model";
 import { ICreateStudentInput, IStudentFilters, ExamStatus } from "./student.interface";
 import { Types } from "mongoose";
-import { QuestionSetService } from "../questionSet/questionSet.service";
+import { ListeningService } from "../listening/listening.service";
+import { ReadingService } from "../reading/reading.service";
 import { AutoMarkingService } from "../examSession/autoMarking.service";
 import { EmailService } from "../../utils/email.service";
 // Updated: questionText + isCorrect recalculation on backend v2
@@ -333,6 +334,7 @@ const verifyExamId = async (examId: string) => {
             examId: student.examId,
             name: student.nameEnglish,
         },
+        assignedSets: student.assignedSets,
         completedModules: student.completedModules || [],
         scores: student.scores,
     };
@@ -612,23 +614,23 @@ const saveModuleScore = async (
             try {
                 const listeningSetNumber = student.assignedSets?.listeningSetNumber;
                 if (listeningSetNumber) {
-                    const correctAnswerMap = await QuestionSetService.getAnswersForGrading("LISTENING", listeningSetNumber);
+                    const correctAnswerMap = await ListeningService.getAnswersForGrading(listeningSetNumber);
                     // Merge correct answers with student answers and RECALCULATE isCorrect
                     let correctCount = 0;
                     const answersWithCorrect = scoreData.answers.map((ans: any) => {
                         const studentAns = AutoMarkingService.normalizeAnswer(ans.studentAnswer || ans.studentAnswerFull || "");
-                        const correctAnswers = correctAnswerMap[Number(ans.questionNumber)];
+                        const answerEntry = correctAnswerMap[Number(ans.questionNumber)];
 
                         let isCorrect = false;
                         let canonicalCorrect = "";
 
-                        if (Array.isArray(correctAnswers)) {
-                            isCorrect = studentAns !== "" && correctAnswers.some(c => AutoMarkingService.normalizeAnswer(c) === studentAns);
-                            canonicalCorrect = correctAnswers[0]?.toString() || "";
-                        } else {
-                            const correctAns = AutoMarkingService.normalizeAnswer(correctAnswers || "");
-                            isCorrect = studentAns !== "" && studentAns === correctAns;
-                            canonicalCorrect = correctAnswers?.toString() || "";
+                        if (answerEntry) {
+                            const correctVal = answerEntry.correct;
+                            const acceptable = answerEntry.acceptable || [];
+                            // Combine correct + acceptable for matching
+                            const allCorrect = Array.isArray(correctVal) ? [...correctVal, ...acceptable] : [correctVal, ...acceptable];
+                            isCorrect = studentAns !== "" && allCorrect.some(c => AutoMarkingService.normalizeAnswer(c?.toString() || "") === studentAns);
+                            canonicalCorrect = Array.isArray(correctVal) ? correctVal[0]?.toString() || "" : correctVal?.toString() || "";
                         }
 
                         if (isCorrect) correctCount++;
@@ -693,36 +695,25 @@ const saveModuleScore = async (
             try {
                 const readingSetNumber = student.assignedSets?.readingSetNumber;
                 if (readingSetNumber) {
-                    const correctAnswerMap = await QuestionSetService.getAnswersForGrading("READING", readingSetNumber);
-
-                    // Fetch testType for reading band calculation
-                    let testType: "academic" | "general-training" = "academic";
-                    try {
-                        const { ReadingTest } = await import("../reading/reading.model");
-                        const test = await ReadingTest.findOne({ testNumber: readingSetNumber }).select("testType").lean();
-                        if (test?.testType) {
-                            testType = test.testType as any;
-                        }
-                    } catch (e) {
-                        console.error("Error fetching ReadingTest for type:", e);
-                    }
+                    const readingGradingData = await ReadingService.getAnswersForGrading(readingSetNumber);
+                    const correctAnswerMap = readingGradingData.answerMap;
+                    const testType: "academic" | "general-training" = (readingGradingData.testType as any) || "academic";
 
                     // Merge correct answers with student answers and RECALCULATE isCorrect
                     let correctCount = 0;
                     const answersWithCorrect = scoreData.answers.map((ans: any) => {
                         const studentAns = AutoMarkingService.normalizeAnswer(ans.studentAnswer || ans.studentAnswerFull || "");
-                        const correctAnswers = correctAnswerMap[Number(ans.questionNumber)];
+                        const answerEntry = correctAnswerMap[Number(ans.questionNumber)];
 
                         let isCorrect = false;
                         let canonicalCorrect = "";
 
-                        if (Array.isArray(correctAnswers)) {
-                            isCorrect = studentAns !== "" && correctAnswers.some(c => AutoMarkingService.normalizeAnswer(c) === studentAns);
-                            canonicalCorrect = correctAnswers[0]?.toString() || "";
-                        } else {
-                            const correctAns = AutoMarkingService.normalizeAnswer(correctAnswers || "");
-                            isCorrect = studentAns !== "" && studentAns === correctAns;
-                            canonicalCorrect = correctAnswers?.toString() || "";
+                        if (answerEntry) {
+                            const correctVal = answerEntry.correct;
+                            const acceptable = answerEntry.acceptable || [];
+                            const allCorrect = Array.isArray(correctVal) ? [...correctVal, ...acceptable] : [correctVal, ...acceptable];
+                            isCorrect = studentAns !== "" && allCorrect.some(c => AutoMarkingService.normalizeAnswer(c?.toString() || "") === studentAns);
+                            canonicalCorrect = Array.isArray(correctVal) ? correctVal[0]?.toString() || "" : correctVal?.toString() || "";
                         }
 
                         if (isCorrect) correctCount++;
