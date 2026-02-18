@@ -93,13 +93,20 @@ const QuestionGroupSchema = new Schema({
     mainHeading: { type: String },
     note: { type: String }, // For "NB You may use any letter more than once."
     // For note-completion
+    passage: { type: String }, // For formatted note-completion passage with blanks
     notesSections: [NotesSectionSchema],
     // For TRUE/FALSE/NOT GIVEN and YES/NO/NOT GIVEN
     optionsExplanation: [OptionsExplanationSchema],
     statements: [StatementSchema],
-    // For matching-information
+    // For matching-information and matching-features
     paragraphOptions: [{ type: String }], // ["A", "B", "C", "D", "E", "F", "G"]
     matchingItems: [MatchingItemSchema],
+    // For matching-features (labeled options like "A - Peter Fleming")
+    featureListTitle: { type: String }, // e.g. "List of Explorers"
+    featureOptions: [{
+        letter: { type: String },
+        text: { type: String }
+    }],
     // For summary-completion
     summarySegments: [SummarySegmentSchema],
     // For choose-two-letters
