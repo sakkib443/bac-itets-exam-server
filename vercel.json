@@ -1,24 +1,15 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "src/server.ts",
-            "use": "@vercel/node",
-            "config": {
-                "maxDuration": 30
-            }
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "src/server.ts"
-        }
-    ],
     "functions": {
         "src/server.ts": {
             "memory": 1024,
-            "maxDuration": 30
+            "maxDuration": 60
         }
-    }
+    },
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "src/server.ts"
+        }
+    ]
 }
