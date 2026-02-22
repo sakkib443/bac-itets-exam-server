@@ -151,10 +151,12 @@ const getAnswersForGrading = async (testNumber: number) => {
     if (test.sections) {
         test.sections.forEach((section) => {
             section.questions.forEach((q) => {
-                answerMap[q.questionNumber] = {
-                    correct: q.correctAnswer,
-                    acceptable: q.acceptableAnswers
-                };
+                if (q.questionNumber) {
+                    answerMap[q.questionNumber] = {
+                        correct: q.correctAnswer,
+                        acceptable: q.acceptableAnswers
+                    };
+                }
             });
         });
     }

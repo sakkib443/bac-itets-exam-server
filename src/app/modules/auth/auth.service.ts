@@ -22,8 +22,8 @@ const register = async (userData: IUser) => {
     // Generate JWT token
     const token = jwt.sign(
         { id: user._id, email: user.email, role: user.role },
-        config.jwt_secret,
-        { expiresIn: config.jwt_expires_in }
+        config.jwt_secret as jwt.Secret,
+        { expiresIn: config.jwt_expires_in as jwt.SignOptions["expiresIn"] }
     );
 
     return {
@@ -56,8 +56,8 @@ const login = async (credentials: ILoginCredentials) => {
     // Generate JWT token
     const token = jwt.sign(
         { id: user._id, email: user.email, role: user.role },
-        config.jwt_secret,
-        { expiresIn: config.jwt_expires_in }
+        config.jwt_secret as jwt.Secret,
+        { expiresIn: config.jwt_expires_in as jwt.SignOptions["expiresIn"] }
     );
 
     return {

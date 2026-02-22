@@ -42,7 +42,7 @@ const getAllExams = async (query: any = {}) => {
 };
 
 const getExamById = async (examId: string, includeAnswers: boolean = false) => {
-    let query = Exam.findOne({ examId });
+    let query: any = Exam.findOne({ examId });
 
     if (!includeAnswers) {
         query = query.select(
