@@ -153,7 +153,7 @@ const getAnswersForGrading = async (testNumber: number) => {
             section.questions.forEach((q) => {
                 if (q.questionNumber) {
                     answerMap[q.questionNumber] = {
-                        correct: q.correctAnswer,
+                        correct: q.correctAnswer || "",
                         acceptable: q.acceptableAnswers
                     };
                 }
