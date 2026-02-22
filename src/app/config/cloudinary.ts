@@ -21,14 +21,24 @@ export const upload = multer({
     fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
         // Allow audio and image files
         const allowedMimes = [
+            // Audio
             "audio/mpeg",
             "audio/mp3",
             "audio/wav",
+            "audio/x-wav",
             "audio/ogg",
+            "audio/aac",
+            "audio/mp4",
+            "audio/x-m4a",
+            "audio/m4a",
+            "audio/flac",
+            "audio/webm",
+            // Image
             "image/jpeg",
             "image/png",
             "image/gif",
             "image/webp",
+            // Video
             "video/webm",
             "video/mp4",
         ];
