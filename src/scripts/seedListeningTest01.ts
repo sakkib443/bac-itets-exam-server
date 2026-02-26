@@ -23,7 +23,7 @@ async function seedListeningTest01() {
             testNumber: 1,
             title: "Listening Test 01",
             description: "IELTS Academic Listening Test 01 — 4 parts, 40 questions",
-            source: "Cambridge IELTS",
+            source: "Cambridge IELTS 15",
             mainAudioUrl: "",
             audioDuration: 1800,
             difficulty: "medium" as const,
@@ -61,7 +61,7 @@ async function seedListeningTest01() {
                             questionNumber: 1,
                             questionType: "note-completion" as const,
                             questionText: "Name of agent: Becky ________",
-                            correctAnswer: "",
+                            correctAnswer: "Jamieson",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -69,7 +69,7 @@ async function seedListeningTest01() {
                             questionNumber: 2,
                             questionType: "note-completion" as const,
                             questionText: "Best to call her in the ________",
-                            correctAnswer: "",
+                            correctAnswer: "afternoon",
                             marks: 1, wordLimit: 1
                         },
 
@@ -83,7 +83,7 @@ async function seedListeningTest01() {
                             questionNumber: 3,
                             questionType: "note-completion" as const,
                             questionText: "Must have good ________ skills",
-                            correctAnswer: "",
+                            correctAnswer: "communication",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -91,7 +91,7 @@ async function seedListeningTest01() {
                             questionNumber: 4,
                             questionType: "note-completion" as const,
                             questionText: "Jobs are usually for at least one ________",
-                            correctAnswer: "",
+                            correctAnswer: "week",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -99,7 +99,7 @@ async function seedListeningTest01() {
                             questionNumber: 5,
                             questionType: "note-completion" as const,
                             questionText: "Pay is usually £ ________ per hour",
-                            correctAnswer: "",
+                            correctAnswer: "10",
                             marks: 1, wordLimit: 2
                         },
 
@@ -113,7 +113,7 @@ async function seedListeningTest01() {
                             questionNumber: 6,
                             questionType: "note-completion" as const,
                             questionText: "Wear a ________ to the interview",
-                            correctAnswer: "",
+                            correctAnswer: "suit",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -121,7 +121,7 @@ async function seedListeningTest01() {
                             questionNumber: 7,
                             questionType: "note-completion" as const,
                             questionText: "Must bring your ________ to the interview",
-                            correctAnswer: "",
+                            correctAnswer: "passport",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -129,7 +129,7 @@ async function seedListeningTest01() {
                             questionNumber: 8,
                             questionType: "note-completion" as const,
                             questionText: "They will ask questions about each applicant's ________",
-                            correctAnswer: "",
+                            correctAnswer: "personality",
                             marks: 1, wordLimit: 1
                         },
 
@@ -143,7 +143,7 @@ async function seedListeningTest01() {
                             questionNumber: 9,
                             questionType: "note-completion" as const,
                             questionText: "The ________ you receive at interview will benefit you",
-                            correctAnswer: "",
+                            correctAnswer: "feedback",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -155,7 +155,7 @@ async function seedListeningTest01() {
                             questionNumber: 10,
                             questionType: "note-completion" as const,
                             questionText: "Less ________ is involved in applying for jobs",
-                            correctAnswer: "",
+                            correctAnswer: "time",
                             marks: 1, wordLimit: 1
                         },
                     ]
@@ -188,7 +188,7 @@ async function seedListeningTest01() {
                                 "B. arranges holidays to more destinations than its competitors.",
                                 "C. has more customers than its competitors."
                             ],
-                            correctAnswer: "",
+                            correctAnswer: "A",
                             marks: 1
                         },
 
@@ -203,7 +203,7 @@ async function seedListeningTest01() {
                                 "B. Heysham",
                                 "C. Luton"
                             ],
-                            correctAnswer: "",
+                            correctAnswer: "B",
                             marks: 1
                         },
 
@@ -218,7 +218,7 @@ async function seedListeningTest01() {
                                 "B. four",
                                 "C. five"
                             ],
-                            correctAnswer: "",
+                            correctAnswer: "A",
                             marks: 1
                         },
 
@@ -233,7 +233,7 @@ async function seedListeningTest01() {
                                 "B. booking at short notice.",
                                 "C. transferring to another date."
                             ],
-                            correctAnswer: "",
+                            correctAnswer: "C",
                             marks: 1
                         },
 
@@ -249,7 +249,7 @@ async function seedListeningTest01() {
                             questionNumber: 15,
                             questionType: "table-completion" as const,
                             questionText: "Hotel dining room has view of the ________",
-                            correctAnswer: "",
+                            correctAnswer: "river",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -257,7 +257,7 @@ async function seedListeningTest01() {
                             questionNumber: 16,
                             questionType: "table-completion" as const,
                             questionText: "Tynwald may have been founded in ________",
-                            correctAnswer: "",
+                            correctAnswer: "1422",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -265,7 +265,7 @@ async function seedListeningTest01() {
                             questionNumber: 17,
                             questionType: "table-completion" as const,
                             questionText: "Train to the ________ of Snaefell",
-                            correctAnswer: "",
+                            correctAnswer: "top",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -273,7 +273,7 @@ async function seedListeningTest01() {
                             questionNumber: 18,
                             questionType: "table-completion" as const,
                             questionText: "Company provides a ________ for local transport and heritage sites",
-                            correctAnswer: "",
+                            correctAnswer: "pass",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -281,7 +281,7 @@ async function seedListeningTest01() {
                             questionNumber: 19,
                             questionType: "table-completion" as const,
                             questionText: "Take the ________ railway train from Douglas to Port Erin",
-                            correctAnswer: "",
+                            correctAnswer: "steam",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -289,7 +289,7 @@ async function seedListeningTest01() {
                             questionNumber: 20,
                             questionType: "table-completion" as const,
                             questionText: "Coach to Castletown — former ________ has old castle",
-                            correctAnswer: "",
+                            correctAnswer: "capital",
                             marks: 1, wordLimit: 1
                         },
                     ]
@@ -318,8 +318,8 @@ async function seedListeningTest01() {
                             questionNumber: 21,
                             questionType: "matching" as const,
                             questionText: "the eldest child",
-                            options: ["A. outgoing", "B. selfish", "C. independent", "D. attention-seeking", "E. introverted", "F. co-operative", "G. caring", "H. competitive"],
-                            correctAnswer: "",
+                            options: ["A", "B", "C", "D", "E", "F", "G", "H"],
+                            correctAnswer: "G",
                             marks: 1
                         },
                         // Q22
@@ -328,8 +328,8 @@ async function seedListeningTest01() {
                             questionNumber: 22,
                             questionType: "matching" as const,
                             questionText: "a middle child",
-                            options: ["A. outgoing", "B. selfish", "C. independent", "D. attention-seeking", "E. introverted", "F. co-operative", "G. caring", "H. competitive"],
-                            correctAnswer: "",
+                            options: ["A", "B", "C", "D", "E", "F", "G", "H"],
+                            correctAnswer: "F",
                             marks: 1
                         },
                         // Q23
@@ -338,8 +338,8 @@ async function seedListeningTest01() {
                             questionNumber: 23,
                             questionType: "matching" as const,
                             questionText: "the youngest child",
-                            options: ["A. outgoing", "B. selfish", "C. independent", "D. attention-seeking", "E. introverted", "F. co-operative", "G. caring", "H. competitive"],
-                            correctAnswer: "",
+                            options: ["A", "B", "C", "D", "E", "F", "G", "H"],
+                            correctAnswer: "A",
                             marks: 1
                         },
                         // Q24
@@ -348,8 +348,8 @@ async function seedListeningTest01() {
                             questionNumber: 24,
                             questionType: "matching" as const,
                             questionText: "a twin",
-                            options: ["A. outgoing", "B. selfish", "C. independent", "D. attention-seeking", "E. introverted", "F. co-operative", "G. caring", "H. competitive"],
-                            correctAnswer: "",
+                            options: ["A", "B", "C", "D", "E", "F", "G", "H"],
+                            correctAnswer: "E",
                             marks: 1
                         },
                         // Q25
@@ -358,8 +358,8 @@ async function seedListeningTest01() {
                             questionNumber: 25,
                             questionType: "matching" as const,
                             questionText: "an only child",
-                            options: ["A. outgoing", "B. selfish", "C. independent", "D. attention-seeking", "E. introverted", "F. co-operative", "G. caring", "H. competitive"],
-                            correctAnswer: "",
+                            options: ["A", "B", "C", "D", "E", "F", "G", "H"],
+                            correctAnswer: "B",
                             marks: 1
                         },
                         // Q26
@@ -368,8 +368,8 @@ async function seedListeningTest01() {
                             questionNumber: 26,
                             questionType: "matching" as const,
                             questionText: "a child with much older siblings",
-                            options: ["A. outgoing", "B. selfish", "C. independent", "D. attention-seeking", "E. introverted", "F. co-operative", "G. caring", "H. competitive"],
-                            correctAnswer: "",
+                            options: ["A", "B", "C", "D", "E", "F", "G", "H"],
+                            correctAnswer: "C",
                             marks: 1
                         },
 
@@ -390,7 +390,7 @@ async function seedListeningTest01() {
                                 "B. There is little doubt that birth order has less influence on academic achievement than socio-economic status.",
                                 "C. Some studies have neglected to include important factors such as family size."
                             ],
-                            correctAnswer: "",
+                            correctAnswer: "C",
                             marks: 1
                         },
 
@@ -405,7 +405,7 @@ async function seedListeningTest01() {
                                 "B. The advantages they have only lead to a slightly higher level of achievement.",
                                 "C. The extra parental attention they receive at a young age makes little difference."
                             ],
-                            correctAnswer: "",
+                            correctAnswer: "A",
                             marks: 1
                         },
 
@@ -419,16 +419,16 @@ async function seedListeningTest01() {
                         {
                             blockType: "question" as const,
                             questionNumber: 29,
-                            questionType: "multiple-choice" as const,
-                            questionText: "Which TWO experiences of sibling rivalry do the speakers agree has been valuable for them? (First answer)",
+                            questionType: "multiple-choice-multi" as const,
+                            questionText: "Which TWO experiences of sibling rivalry do the speakers agree has been valuable for them?",
                             options: [
                                 "A. learning to share",
                                 "B. learning to stand up for oneself",
-                                "C. learning to be a good loser",
-                                "D. learning to be tolerant",
-                                "E. learning to say sorry"
+                                "C. having to put up with each other",
+                                "D. finding out what is important in life",
+                                "E. learning to be a good loser"
                             ],
-                            correctAnswer: "",
+                            correctAnswer: "B",
                             marks: 1
                         },
 
@@ -436,16 +436,16 @@ async function seedListeningTest01() {
                         {
                             blockType: "question" as const,
                             questionNumber: 30,
-                            questionType: "multiple-choice" as const,
-                            questionText: "Which TWO experiences of sibling rivalry do the speakers agree has been valuable for them? (Second answer)",
+                            questionType: "multiple-choice-multi" as const,
+                            questionText: "Which TWO experiences of sibling rivalry do the speakers agree has been valuable for them?",
                             options: [
                                 "A. learning to share",
                                 "B. learning to stand up for oneself",
-                                "C. learning to be a good loser",
-                                "D. learning to be tolerant",
-                                "E. learning to say sorry"
+                                "C. having to put up with each other",
+                                "D. finding out what is important in life",
+                                "E. learning to be a good loser"
                             ],
-                            correctAnswer: "",
+                            correctAnswer: "D",
                             marks: 1
                         },
                     ]
@@ -477,7 +477,7 @@ async function seedListeningTest01() {
                             questionNumber: 31,
                             questionType: "note-completion" as const,
                             questionText: "It provides ________ and food for a wide range of species",
-                            correctAnswer: "",
+                            correctAnswer: "shelter",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -485,21 +485,21 @@ async function seedListeningTest01() {
                             questionNumber: 32,
                             questionType: "note-completion" as const,
                             questionText: "Its leaves provide ________ which is used to make a disinfectant",
-                            correctAnswer: "",
+                            correctAnswer: "oil",
                             marks: 1, wordLimit: 1
                         },
 
                         // ─── Reasons for present decline ───
                         {
                             blockType: "instruction" as const,
-                            content: "<strong>Reasons for present decline in number</strong><br/><strong>A) Diseases</strong><br/><strong>(i) 'Mundulla Yellows'</strong><ul><li>Cause – lime used for making <strong>[33]</strong> was absorbed</li><li>Trees were unable to take in necessary iron through their roots</li></ul>"
+                            content: "<strong>Reasons for present decline in number</strong><br/><strong>(i) 'Mundulla Yellows'</strong><ul><li>Cause – lime used for making <strong>[33]</strong> was absorbed</li><li>Trees were unable to take in necessary iron through their roots</li></ul>"
                         },
                         {
                             blockType: "question" as const,
                             questionNumber: 33,
                             questionType: "note-completion" as const,
                             questionText: "Cause – lime used for making ________ was absorbed",
-                            correctAnswer: "",
+                            correctAnswer: "roads",
                             marks: 1, wordLimit: 1
                         },
 
@@ -513,21 +513,21 @@ async function seedListeningTest01() {
                             questionNumber: 34,
                             questionType: "note-completion" as const,
                             questionText: "Cause – ________ feed on eucalyptus leaves",
-                            correctAnswer: "",
+                            correctAnswer: "insects",
                             marks: 1, wordLimit: 1
                         },
 
                         // ─── Bushfires ───
                         {
                             blockType: "instruction" as const,
-                            content: "<strong>B) Bushfires</strong><br/>William Jackson's theory:<br/><ul><li>High-frequency bushfires have impact on vegetation, resulting in the growth of <strong>[35]</strong></li><li>Mid-frequency bushfires result in the growth of eucalyptus forests, because they:</li></ul>"
+                            content: "<strong>William Jackson's theory:</strong><br/><ul><li>High-frequency bushfires have impact on vegetation, resulting in the growth of <strong>[35]</strong></li><li>Mid-frequency bushfires result in the growth of eucalyptus forests, because they:</li></ul>"
                         },
                         {
                             blockType: "question" as const,
                             questionNumber: 35,
                             questionType: "note-completion" as const,
                             questionText: "High-frequency bushfires result in the growth of ________",
-                            correctAnswer: "",
+                            correctAnswer: "grass",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -535,7 +535,7 @@ async function seedListeningTest01() {
                             questionNumber: 36,
                             questionType: "note-completion" as const,
                             questionText: "Make more ________ available to the trees",
-                            correctAnswer: "",
+                            correctAnswer: "water",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -543,7 +543,7 @@ async function seedListeningTest01() {
                             questionNumber: 37,
                             questionType: "note-completion" as const,
                             questionText: "Maintain the quality of the ________",
-                            correctAnswer: "",
+                            correctAnswer: "soil",
                             marks: 1, wordLimit: 1
                         },
 
@@ -557,7 +557,7 @@ async function seedListeningTest01() {
                             questionNumber: 38,
                             questionType: "note-completion" as const,
                             questionText: "Low-frequency bushfires result in the growth of ________ rainforest",
-                            correctAnswer: "",
+                            correctAnswer: "dry",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -565,7 +565,7 @@ async function seedListeningTest01() {
                             questionNumber: 39,
                             questionType: "note-completion" as const,
                             questionText: "A ________ ecosystem",
-                            correctAnswer: "",
+                            correctAnswer: "simple",
                             marks: 1, wordLimit: 1
                         },
                         {
@@ -573,7 +573,7 @@ async function seedListeningTest01() {
                             questionNumber: 40,
                             questionType: "note-completion" as const,
                             questionText: "An ideal environment for the ________ of the bell-miner",
-                            correctAnswer: "",
+                            correctAnswer: "nest",
                             marks: 1, wordLimit: 1
                         },
                     ]
@@ -589,7 +589,7 @@ async function seedListeningTest01() {
         console.log("Title     :", newTest.title);
         console.log("Sections  :", newTest.sections?.length);
         console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        console.log("\n⚠️  Correct answers are EMPTY — update them after getting the answer key.");
+        console.log("\n✅ All 40 correct answers are pre-filled (Cambridge IELTS 15 Test 1).");
 
         await mongoose.disconnect();
         console.log("\nDisconnected from MongoDB. Done!");
