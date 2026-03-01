@@ -61,9 +61,13 @@ const createStudent = async (
         paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
         assignedSets: {
             listeningSetNumber: data.listeningSetNumber,
+            listeningSetNumbers: data.listeningSetNumbers || (data.listeningSetNumber ? [data.listeningSetNumber] : []),
             readingSetNumber: data.readingSetNumber,
+            readingSetNumbers: data.readingSetNumbers || (data.readingSetNumber ? [data.readingSetNumber] : []),
             writingSetNumber: data.writingSetNumber,
+            writingSetNumbers: data.writingSetNumbers || (data.writingSetNumber ? [data.writingSetNumber] : []),
             speakingSetNumber: data.speakingSetNumber,
+            speakingSetNumbers: data.speakingSetNumbers || (data.speakingSetNumber ? [data.speakingSetNumber] : []),
         },
         createdBy: new Types.ObjectId(adminId),
     });
@@ -229,7 +233,7 @@ const updateStudent = async (id: string, updateData: Partial<ICreateStudentInput
         updateObj.paymentDate = new Date(updateData.paymentDate);
     }
 
-    // Handle assigned sets
+    // Handle assigned sets - single values
     if (updateData.listeningSetNumber !== undefined) {
         updateObj["assignedSets.listeningSetNumber"] = updateData.listeningSetNumber;
     }
@@ -243,11 +247,29 @@ const updateStudent = async (id: string, updateData: Partial<ICreateStudentInput
         updateObj["assignedSets.speakingSetNumber"] = (updateData as any).speakingSetNumber;
     }
 
+    // Handle assigned sets - multi-set arrays
+    if ((updateData as any).listeningSetNumbers !== undefined) {
+        updateObj["assignedSets.listeningSetNumbers"] = (updateData as any).listeningSetNumbers;
+    }
+    if ((updateData as any).readingSetNumbers !== undefined) {
+        updateObj["assignedSets.readingSetNumbers"] = (updateData as any).readingSetNumbers;
+    }
+    if ((updateData as any).writingSetNumbers !== undefined) {
+        updateObj["assignedSets.writingSetNumbers"] = (updateData as any).writingSetNumbers;
+    }
+    if ((updateData as any).speakingSetNumbers !== undefined) {
+        updateObj["assignedSets.speakingSetNumbers"] = (updateData as any).speakingSetNumbers;
+    }
+
     // Remove individual set fields from root
     delete updateObj.listeningSetNumber;
     delete updateObj.readingSetNumber;
     delete updateObj.writingSetNumber;
     delete (updateObj as any).speakingSetNumber;
+    delete (updateObj as any).listeningSetNumbers;
+    delete (updateObj as any).readingSetNumbers;
+    delete (updateObj as any).writingSetNumbers;
+    delete (updateObj as any).speakingSetNumbers;
 
     const updatedStudent = await Student.findByIdAndUpdate(
         id,
@@ -578,10 +600,11 @@ const saveModuleScore = async (
         task1Words?: number;
         task2Words?: number;
         answers?: any;
+        setNumber?: number;
     }
 ) => {
-    console.log("[saveModuleScore] Starting for examId:", examId, "module:", module);
-    console.log("[saveModuleScore] scoreData:", JSON.stringify(scoreData, null, 2));
+    const setNumber = scoreData.setNumber;
+    console.log("[saveModuleScore] Starting for examId:", examId, "module:", module, "setNumber:", setNumber);
 
     // First find the student
     const student = await Student.findOne({ examId: examId.toUpperCase() });
@@ -590,11 +613,28 @@ const saveModuleScore = async (
         throw new Error("Student not found");
     }
 
-    // Check if module already completed
-    const completedModules = student.completedModules || [];
-    if (completedModules.includes(module)) {
+    // Check multi-set: determine completion key
+    const assignedSets = student.assignedSets || {} as any;
+    const moduleSetNumbers = assignedSets[`${module}SetNumbers`] || [];
+    const singleSetNumber = assignedSets[`${module}SetNumber`];
+    const hasMultipleSets = moduleSetNumbers.length > 1;
+
+    // For multi-set: use "listening:5", for single-set: use "listening"
+    const completedModuleKey = hasMultipleSets && setNumber != null
+        ? `${module}:${setNumber}`
+        : module;
+
+    // Check if this specific set/module already completed
+    const completedModules: string[] = (student.completedModules || []) as string[];
+    if (completedModules.includes(completedModuleKey)) {
+        throw new Error(`${module} exam (set ${setNumber || 'default'}) has already been completed`);
+    }
+    if (!hasMultipleSets && completedModules.includes(module)) {
         throw new Error(`${module} exam has already been completed`);
     }
+
+    // Determine which set number to use for grading
+    const gradingSetNumber = setNumber || singleSetNumber || (moduleSetNumbers.length > 0 ? moduleSetNumbers[0] : null);
 
     // Build update object using dot notation for nested fields
     const updateObj: Record<string, any> = {
@@ -612,7 +652,7 @@ const saveModuleScore = async (
         if (scoreData.answers && Array.isArray(scoreData.answers)) {
             // Fetch correct answers from question set
             try {
-                const listeningSetNumber = student.assignedSets?.listeningSetNumber;
+                const listeningSetNumber = gradingSetNumber;
                 if (listeningSetNumber) {
                     const correctAnswerMap = await ListeningService.getAnswersForGrading(listeningSetNumber);
                     // Merge correct answers with student answers and RECALCULATE isCorrect
@@ -693,7 +733,7 @@ const saveModuleScore = async (
         if (scoreData.answers && Array.isArray(scoreData.answers)) {
             // Fetch correct answers from question set
             try {
-                const readingSetNumber = student.assignedSets?.readingSetNumber;
+                const readingSetNumber = gradingSetNumber;
                 if (readingSetNumber) {
                     const readingGradingData = await ReadingService.getAnswersForGrading(readingSetNumber);
                     const correctAnswerMap = readingGradingData.answerMap;
@@ -806,12 +846,14 @@ const saveModuleScore = async (
 
     console.log("[saveModuleScore] Final updateObj:", JSON.stringify(updateObj, null, 2));
 
-    // Use findOneAndUpdate with $addToSet to avoid race conditions when multiple modules complete at once
+    console.log("[saveModuleScore] completedModuleKey:", completedModuleKey);
+
+    // Use findOneAndUpdate with $addToSet to avoid race conditions
     const updatedStudent = await Student.findOneAndUpdate(
         { examId: examId.toUpperCase() },
         {
             $set: updateObj,
-            $addToSet: { completedModules: module }
+            $addToSet: { completedModules: completedModuleKey }
         },
         { new: true, runValidators: true }
     );
@@ -820,9 +862,14 @@ const saveModuleScore = async (
         throw new Error("Failed to update student");
     }
 
-    // After atomic update, check if all modules are now completed
+    // Calculate total expected sets for completion check
+    const listeningTotal = assignedSets.listeningSetNumbers?.length || (assignedSets.listeningSetNumber ? 1 : 0);
+    const readingTotal = assignedSets.readingSetNumbers?.length || (assignedSets.readingSetNumber ? 1 : 0);
+    const writingTotal = assignedSets.writingSetNumbers?.length || (assignedSets.writingSetNumber ? 1 : 0);
+    const totalExpected = Math.max(listeningTotal, 1) + Math.max(readingTotal, 1) + Math.max(writingTotal, 1);
+
     const currentCompletedCount = updatedStudent.completedModules?.length || 0;
-    if (currentCompletedCount >= 3 && updatedStudent.examStatus !== "completed") {
+    if (currentCompletedCount >= totalExpected && updatedStudent.examStatus !== "completed") {
         updatedStudent.examStatus = "completed";
         updatedStudent.examCompletedAt = new Date();
         await updatedStudent.save();
@@ -832,14 +879,14 @@ const saveModuleScore = async (
     }
 
     console.log("[saveModuleScore] Updated student completedModules:", updatedStudent.completedModules);
-    console.log("[saveModuleScore] Updated student writing answers:", updatedStudent.examAnswers?.writing);
 
     return {
         examId: updatedStudent.examId,
         module,
+        setNumber: setNumber,
         band: scoreData.band,
         completedModules: updatedStudent.completedModules,
-        allCompleted: (updatedStudent.completedModules?.length || 0) >= 3,
+        allCompleted: currentCompletedCount >= totalExpected,
         scores: updatedStudent.scores,
     };
 };
@@ -1429,10 +1476,11 @@ const resetModule = async (
         throw new Error("Student not found");
     }
 
-    const completedModules = student.completedModules || [];
+    const completedModules: string[] = (student.completedModules || []) as string[];
 
-    // Check if module is completed
-    if (!completedModules.includes(module)) {
+    // Check if module or any of its sets are completed
+    const hasCompleted = completedModules.some(m => m === module || m.startsWith(`${module}:`));
+    if (!hasCompleted) {
         throw new Error(`${module} module is not completed yet`);
     }
 
@@ -1440,8 +1488,8 @@ const resetModule = async (
     const updateObj: Record<string, any> = {};
     const unsetObj: Record<string, any> = {};
 
-    // Remove module from completedModules
-    const newCompletedModules = completedModules.filter(m => m !== module);
+    // Remove module AND all its set entries from completedModules
+    const newCompletedModules = completedModules.filter(m => m !== module && !m.startsWith(`${module}:`));
     updateObj.completedModules = newCompletedModules;
 
     // Clear module score and answers using $unset

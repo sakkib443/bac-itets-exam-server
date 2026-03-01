@@ -37,9 +37,13 @@ const createStudentSchema = z.object({
             .string({ message: "Exam date is required" })
             .datetime("Invalid date format"),
         listeningSetNumber: z.number().int().min(1).max(10000).optional(),
+        listeningSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
         readingSetNumber: z.number().int().min(1).max(10000).optional(),
+        readingSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
         writingSetNumber: z.number().int().min(1).max(10000).optional(),
+        writingSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
         speakingSetNumber: z.number().int().min(1).max(10000).optional(),
+        speakingSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
     }),
 });
 
@@ -71,9 +75,13 @@ const updateStudentSchema = z.object({
         paymentReference: z.string().optional(),
         examDate: z.string().datetime().optional(),
         listeningSetNumber: z.number().int().min(1).max(10000).optional(),
+        listeningSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
         readingSetNumber: z.number().int().min(1).max(10000).optional(),
+        readingSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
         writingSetNumber: z.number().int().min(1).max(10000).optional(),
+        writingSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
         speakingSetNumber: z.number().int().min(1).max(10000).optional(),
+        speakingSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
         isActive: z.boolean().optional(),
         canRetake: z.boolean().optional(),
     }),

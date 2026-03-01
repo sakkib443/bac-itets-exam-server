@@ -8,12 +8,16 @@ const assignedSetsSchema = new Schema<IAssignedSets>(
     {
         listeningSetId: { type: Schema.Types.ObjectId, ref: "QuestionSet" },
         listeningSetNumber: { type: Number },
+        listeningSetNumbers: { type: [Number], default: [] },
         readingSetId: { type: Schema.Types.ObjectId, ref: "QuestionSet" },
         readingSetNumber: { type: Number },
+        readingSetNumbers: { type: [Number], default: [] },
         writingSetId: { type: Schema.Types.ObjectId, ref: "QuestionSet" },
         writingSetNumber: { type: Number },
+        writingSetNumbers: { type: [Number], default: [] },
         speakingSetId: { type: Schema.Types.ObjectId, ref: "QuestionSet" },
         speakingSetNumber: { type: Number },
+        speakingSetNumbers: { type: [Number], default: [] },
     },
     { _id: false }
 );

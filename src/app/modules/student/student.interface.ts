@@ -18,12 +18,16 @@ export type PaymentStatus = "pending" | "paid" | "refunded";
 export interface IAssignedSets {
     listeningSetId?: Types.ObjectId;
     listeningSetNumber?: number;
+    listeningSetNumbers?: number[];
     readingSetId?: Types.ObjectId;
     readingSetNumber?: number;
+    readingSetNumbers?: number[];
     writingSetId?: Types.ObjectId;
     writingSetNumber?: number;
+    writingSetNumbers?: number[];
     speakingSetId?: Types.ObjectId;
     speakingSetNumber?: number;
+    speakingSetNumbers?: number[];
 }
 
 // Exam result scores
@@ -166,9 +170,13 @@ export interface ICreateStudentInput {
     paymentReference?: string;
     examDate: Date;
     listeningSetNumber?: number;
+    listeningSetNumbers?: number[];
     readingSetNumber?: number;
+    readingSetNumbers?: number[];
     writingSetNumber?: number;
+    writingSetNumbers?: number[];
     speakingSetNumber?: number;
+    speakingSetNumbers?: number[];
 }
 
 // Verify exam ID input
