@@ -404,7 +404,7 @@ const getAnswerSheet = async (req: Request, res: Response) => {
 const updateAllScores = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { listening, reading, writing, speaking, adminRemarks } = req.body;
+        const { listening, reading, writing, speaking, adminRemarks, setNumber } = req.body;
 
         const result = await StudentService.updateAllScores(id, {
             listening,
@@ -412,6 +412,7 @@ const updateAllScores = async (req: Request, res: Response) => {
             writing,
             speaking,
             adminRemarks,
+            setNumber,
         });
 
         res.status(200).json({

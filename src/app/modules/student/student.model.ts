@@ -47,7 +47,7 @@ const examScoresSchema = new Schema<IExamScores>(
         },
         overall: { type: Number, default: 0 },
     },
-    { _id: false }
+    { _id: false, strict: false }
 );
 
 // Violation sub-schema
@@ -173,7 +173,6 @@ const studentSchema = new Schema<IStudent>(
         // Track completed modules
         completedModules: {
             type: [String],
-            enum: ["listening", "reading", "writing", "speaking", "LISTENING", "READING", "WRITING", "SPEAKING"],
             default: [],
         },
 
@@ -263,6 +262,7 @@ const studentSchema = new Schema<IStudent>(
     },
     {
         timestamps: true,
+        strict: false, // Allow dynamic per-set keys like examAnswers.listening_5, scores.listening_5
     }
 );
 

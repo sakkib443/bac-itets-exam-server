@@ -690,14 +690,25 @@ const saveModuleScore = async (
                     const calculatedBand = AutoMarkingService.convertToBandScore(correctCount, "listening");
 
                     updateObj["examAnswers.listening"] = answersWithCorrect;
-                    updateObj["scores.listening"] = {
+                    // Also store per-set if multi-set
+                    if (hasMultipleSets && setNumber != null) {
+                        updateObj[`examAnswers.listening_${setNumber}`] = answersWithCorrect;
+                    }
+                    const scoreObj = {
                         raw: correctCount,
                         band: calculatedBand,
                         correctAnswers: correctCount,
                         totalQuestions: scoreData.total || 40,
                     };
+                    updateObj["scores.listening"] = scoreObj;
+                    if (hasMultipleSets && setNumber != null) {
+                        updateObj[`scores.listening_${setNumber}`] = scoreObj;
+                    }
                 } else {
                     updateObj["examAnswers.listening"] = scoreData.answers;
+                    if (hasMultipleSets && setNumber != null) {
+                        updateObj[`examAnswers.listening_${setNumber}`] = scoreData.answers;
+                    }
                     updateObj["scores.listening"] = {
                         raw: scoreData.score || 0,
                         band: scoreData.band,
@@ -708,6 +719,9 @@ const saveModuleScore = async (
             } catch (err) {
                 console.error("Failed to fetch correct answers for listening:", err);
                 updateObj["examAnswers.listening"] = scoreData.answers;
+                if (hasMultipleSets && setNumber != null) {
+                    updateObj[`examAnswers.listening_${setNumber}`] = scoreData.answers;
+                }
                 updateObj["scores.listening"] = {
                     raw: scoreData.score || 0,
                     band: scoreData.band,
@@ -773,14 +787,24 @@ const saveModuleScore = async (
                     const calculatedBand = AutoMarkingService.convertToBandScore(correctCount, "reading", testType);
 
                     updateObj["examAnswers.reading"] = answersWithCorrect;
-                    updateObj["scores.reading"] = {
+                    if (hasMultipleSets && setNumber != null) {
+                        updateObj[`examAnswers.reading_${setNumber}`] = answersWithCorrect;
+                    }
+                    const readingScoreObj = {
                         raw: correctCount,
                         band: calculatedBand,
                         correctAnswers: correctCount,
                         totalQuestions: scoreData.total || 40,
                     };
+                    updateObj["scores.reading"] = readingScoreObj;
+                    if (hasMultipleSets && setNumber != null) {
+                        updateObj[`scores.reading_${setNumber}`] = readingScoreObj;
+                    }
                 } else {
                     updateObj["examAnswers.reading"] = scoreData.answers;
+                    if (hasMultipleSets && setNumber != null) {
+                        updateObj[`examAnswers.reading_${setNumber}`] = scoreData.answers;
+                    }
                     updateObj["scores.reading"] = {
                         raw: scoreData.score || 0,
                         band: scoreData.band,
@@ -791,6 +815,9 @@ const saveModuleScore = async (
             } catch (err) {
                 console.error("Failed to fetch correct answers for reading:", err);
                 updateObj["examAnswers.reading"] = scoreData.answers;
+                if (hasMultipleSets && setNumber != null) {
+                    updateObj[`examAnswers.reading_${setNumber}`] = scoreData.answers;
+                }
                 updateObj["scores.reading"] = {
                     raw: scoreData.score || 0,
                     band: scoreData.band,
@@ -814,13 +841,20 @@ const saveModuleScore = async (
         };
         if (scoreData.answers) {
             console.log("[saveModuleScore] Writing answers to save:", scoreData.answers);
-            updateObj["examAnswers.writing"] = {
+            const writingAnswers = {
                 task1: scoreData.answers.task1 || "",
                 task2: scoreData.answers.task2 || "",
             };
-            console.log("[saveModuleScore] updateObj examAnswers.writing:", updateObj["examAnswers.writing"]);
+            updateObj["examAnswers.writing"] = writingAnswers;
+            if (hasMultipleSets && setNumber != null) {
+                updateObj[`examAnswers.writing_${setNumber}`] = writingAnswers;
+            }
         } else {
             console.log("[saveModuleScore] No writing answers in scoreData!");
+        }
+        // Also store per-set score
+        if (hasMultipleSets && setNumber != null) {
+            updateObj[`scores.writing_${setNumber}`] = updateObj["scores.writing"];
         }
     } else if (module === "speaking") {
         updateObj["scores.speaking"] = {
@@ -1175,6 +1209,36 @@ const getAnswerSheet = async (studentId: string, module: string) => {
 
     console.log(`[getAnswerSheet] Module: ${moduleName}, Answers count:`, Array.isArray(answers) ? answers.length : 'writing');
 
+    // Collect per-set data for multi-set modules
+    // Use .toObject() to ensure dynamic keys are accessible
+    const studentObj = student.toObject ? student.toObject() : student;
+    const examAnswersObj = (studentObj.examAnswers || {}) as any;
+    const scoresObj = (studentObj.scores || {}) as any;
+    const allSetsData: Record<string, any> = {};
+
+    // Find all per-set keys like listening_5, reading_3 etc
+    const setKeyPrefix = `${moduleName}_`;
+    for (const key of Object.keys(examAnswersObj)) {
+        if (key.startsWith(setKeyPrefix)) {
+            const setNum = key.replace(setKeyPrefix, "");
+            const setAnswers = examAnswersObj[key];
+            const setScores = scoresObj[key] || null;
+            allSetsData[key] = {
+                setNumber: parseInt(setNum),
+                answers: Array.isArray(setAnswers) ? setAnswers.map((ans: any) => ({
+                    questionNumber: ans.questionNumber,
+                    questionText: ans.questionText || `Question ${ans.questionNumber}`,
+                    questionType: ans.questionType || "fill-in-blank",
+                    studentAnswer: ans.studentAnswer || "",
+                    studentAnswerFull: ans.studentAnswerFull || ans.studentAnswer || "",
+                    correctAnswer: ans.correctAnswer || "",
+                    isCorrect: ans.isCorrect || false
+                })).sort((a: any, b: any) => a.questionNumber - b.questionNumber) : setAnswers,
+                scores: setScores,
+            };
+        }
+    }
+
     return {
         student: {
             _id: student._id,
@@ -1184,6 +1248,7 @@ const getAnswerSheet = async (studentId: string, module: string) => {
         module: moduleName,
         answers,
         scores: student.scores?.[moduleName as keyof typeof student.scores],
+        allSetsData: Object.keys(allSetsData).length > 0 ? allSetsData : undefined,
     };
 };
 
@@ -1329,6 +1394,7 @@ const updateAllScores = async (
         writing?: { task1Band: number; task2Band: number; overallBand: number };
         speaking?: { band: number };
         adminRemarks?: string;
+        setNumber?: number | string;
     }
 ) => {
     const student = await Student.findById(studentId);
@@ -1345,15 +1411,27 @@ const updateAllScores = async (
         };
     }
 
+    const setNum = scoresData.setNumber;
+    const updateObj: Record<string, any> = {};
+
     // Update listening scores
     if (scoresData.listening) {
         if (scoresData.listening.correctAnswers !== undefined) {
             student.scores.listening.correctAnswers = scoresData.listening.correctAnswers;
             student.scores.listening.raw = scoresData.listening.correctAnswers;
-            // Automatically calculate band from correct answers
             student.scores.listening.band = AutoMarkingService.convertToBandScore(scoresData.listening.correctAnswers, "listening");
         } else if (scoresData.listening.band !== undefined) {
             student.scores.listening.band = scoresData.listening.band;
+        }
+        // Also save per-set score if setNumber provided
+        if (setNum) {
+            const setKey = `scores.listening_${setNum}`;
+            updateObj[setKey] = {
+                band: student.scores.listening.band,
+                correctAnswers: student.scores.listening.correctAnswers || 0,
+                raw: student.scores.listening.raw || 0,
+                totalQuestions: 40,
+            };
         }
     }
 
@@ -1363,12 +1441,10 @@ const updateAllScores = async (
             student.scores.reading.correctAnswers = scoresData.reading.correctAnswers;
             student.scores.reading.raw = scoresData.reading.correctAnswers;
 
-            // Fetch testType for reading band calculation
             let testType: "academic" | "general-training" = "academic";
             try {
-                const readingSetNumber = student.assignedSets?.readingSetNumber;
+                const readingSetNumber = setNum || student.assignedSets?.readingSetNumber;
                 if (readingSetNumber) {
-                    // Using dynamic import to avoid potential circular dependency if any
                     const { ReadingTest } = await import("../reading/reading.model");
                     const test = await ReadingTest.findOne({ testNumber: readingSetNumber }).select("testType").lean();
                     if (test?.testType) {
@@ -1379,10 +1455,19 @@ const updateAllScores = async (
                 console.error("Error fetching ReadingTest for type in updateAllScores:", e);
             }
 
-            // Automatically calculate band from correct answers
             student.scores.reading.band = AutoMarkingService.convertToBandScore(scoresData.reading.correctAnswers, "reading", testType);
         } else if (scoresData.reading.band !== undefined) {
             student.scores.reading.band = scoresData.reading.band;
+        }
+        // Also save per-set score if setNumber provided
+        if (setNum) {
+            const setKey = `scores.reading_${setNum}`;
+            updateObj[setKey] = {
+                band: student.scores.reading.band,
+                correctAnswers: student.scores.reading.correctAnswers || 0,
+                raw: student.scores.reading.raw || 0,
+                totalQuestions: 40,
+            };
         }
     }
 
@@ -1391,6 +1476,15 @@ const updateAllScores = async (
         student.scores.writing.task1Band = scoresData.writing.task1Band;
         student.scores.writing.task2Band = scoresData.writing.task2Band;
         student.scores.writing.overallBand = scoresData.writing.overallBand;
+        // Also save per-set score if setNumber provided
+        if (setNum) {
+            const setKey = `scores.writing_${setNum}`;
+            updateObj[setKey] = {
+                task1Band: scoresData.writing.task1Band,
+                task2Band: scoresData.writing.task2Band,
+                overallBand: scoresData.writing.overallBand,
+            };
+        }
     }
 
     // Update speaking scores
@@ -1406,19 +1500,25 @@ const updateAllScores = async (
     }
 
     // Recalculate overall band score using Official IELTS rules
-    const listening = Math.max(0, student.scores.listening?.band || 0);
-    const reading = Math.max(0, student.scores.reading?.band || 0);
-    const writing = Math.max(0, student.scores.writing?.overallBand || 0);
-    const speaking = Math.max(0, student.scores.speaking?.band || 0);
+    const listeningBand = Math.max(0, student.scores.listening?.band || 0);
+    const readingBand = Math.max(0, student.scores.reading?.band || 0);
+    const writingBand = Math.max(0, student.scores.writing?.overallBand || 0);
+    const speakingBand = Math.max(0, student.scores.speaking?.band || 0);
 
-    const bands = [listening, reading, writing, speaking].filter(b => b > 0);
+    const bands = [listeningBand, readingBand, writingBand, speakingBand].filter(b => b > 0);
     if (bands.length > 0) {
         student.scores.overall = AutoMarkingService.calculateOverallBand(bands);
     }
 
     await student.save();
 
-    return student;
+    // If per-set keys need saving, use $set for dynamic keys
+    if (Object.keys(updateObj).length > 0) {
+        await Student.findByIdAndUpdate(studentId, { $set: updateObj });
+    }
+
+    // Return updated student with lean() to include dynamic keys
+    return await Student.findById(studentId).select("-password").lean();
 };
 
 // Publish results for student (admin)
