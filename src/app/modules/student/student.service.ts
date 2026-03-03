@@ -52,6 +52,42 @@ const createStudent = async (
     // Auto-generate password (using phone number)
     const autoPassword = data.phone;
 
+    // Build assignedSets from fullSets + extraSets (or legacy fields)
+    const fullSets = data.fullSets || [];
+    const extraSets = data.extraSets || [];
+
+    // Auto-derive legacy setNumbers arrays from fullSets + extraSets
+    const listeningNums: number[] = [];
+    const readingNums: number[] = [];
+    const writingNums: number[] = [];
+
+    fullSets.forEach((fs: any, idx: number) => {
+        if (!fs.label) fs.label = `Full Set ${idx + 1}`;
+        if (fs.listeningSetNumber) listeningNums.push(fs.listeningSetNumber);
+        if (fs.readingSetNumber) readingNums.push(fs.readingSetNumber);
+        if (fs.writingSetNumber) writingNums.push(fs.writingSetNumber);
+    });
+
+    extraSets.forEach((es: any) => {
+        if (es.module === 'listening' && es.setNumber) listeningNums.push(es.setNumber);
+        if (es.module === 'reading' && es.setNumber) readingNums.push(es.setNumber);
+        if (es.module === 'writing' && es.setNumber) writingNums.push(es.setNumber);
+    });
+
+    // If no fullSets provided, use legacy fields (backward compatibility)
+    const assignedSetsData: any = {
+        fullSets: fullSets.length > 0 ? fullSets : undefined,
+        extraSets: extraSets.length > 0 ? extraSets : undefined,
+        listeningSetNumber: data.listeningSetNumber || listeningNums[0],
+        listeningSetNumbers: listeningNums.length > 0 ? listeningNums : (data.listeningSetNumbers || (data.listeningSetNumber ? [data.listeningSetNumber] : [])),
+        readingSetNumber: data.readingSetNumber || readingNums[0],
+        readingSetNumbers: readingNums.length > 0 ? readingNums : (data.readingSetNumbers || (data.readingSetNumber ? [data.readingSetNumber] : [])),
+        writingSetNumber: data.writingSetNumber || writingNums[0],
+        writingSetNumbers: writingNums.length > 0 ? writingNums : (data.writingSetNumbers || (data.writingSetNumber ? [data.writingSetNumber] : [])),
+        speakingSetNumber: data.speakingSetNumber,
+        speakingSetNumbers: data.speakingSetNumbers || (data.speakingSetNumber ? [data.speakingSetNumber] : []),
+    };
+
     // Create student
     const student = await Student.create({
         ...data,
@@ -59,16 +95,7 @@ const createStudent = async (
         password: autoPassword,
         examDate: new Date(data.examDate),
         paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
-        assignedSets: {
-            listeningSetNumber: data.listeningSetNumber,
-            listeningSetNumbers: data.listeningSetNumbers || (data.listeningSetNumber ? [data.listeningSetNumber] : []),
-            readingSetNumber: data.readingSetNumber,
-            readingSetNumbers: data.readingSetNumbers || (data.readingSetNumber ? [data.readingSetNumber] : []),
-            writingSetNumber: data.writingSetNumber,
-            writingSetNumbers: data.writingSetNumbers || (data.writingSetNumber ? [data.writingSetNumber] : []),
-            speakingSetNumber: data.speakingSetNumber,
-            speakingSetNumbers: data.speakingSetNumbers || (data.speakingSetNumber ? [data.speakingSetNumber] : []),
-        },
+        assignedSets: assignedSetsData,
         createdBy: new Types.ObjectId(adminId),
     });
 

@@ -6,6 +6,19 @@ import config from "../../config";
 // Assigned sets sub-schema
 const assignedSetsSchema = new Schema<IAssignedSets>(
     {
+        // Full Sets (L+R+W grouped)
+        fullSets: [{
+            label: { type: String, default: "" },
+            listeningSetNumber: { type: Number },
+            readingSetNumber: { type: Number },
+            writingSetNumber: { type: Number },
+        }],
+        // Extra individual parts
+        extraSets: [{
+            module: { type: String },
+            setNumber: { type: Number },
+        }],
+        // Legacy fields (backward compatible)
         listeningSetId: { type: Schema.Types.ObjectId, ref: "QuestionSet" },
         listeningSetNumber: { type: Number },
         listeningSetNumbers: { type: [Number], default: [] },

@@ -14,8 +14,27 @@ export type PaymentMethod = "cash" | "bkash" | "nagad" | "bank" | "other";
 // Payment status
 export type PaymentStatus = "pending" | "paid" | "refunded";
 
+// Full Set = Listening + Reading + Writing together
+export interface IFullSet {
+    label: string;
+    listeningSetNumber: number;
+    readingSetNumber: number;
+    writingSetNumber: number;
+}
+
+// Extra individual part (outside Full Sets)
+export interface IExtraSet {
+    module: string;
+    setNumber: number;
+}
+
 // Assigned question sets for the student
 export interface IAssignedSets {
+    // Full Sets (grouped L+R+W)
+    fullSets?: IFullSet[];
+    // Extra individual parts
+    extraSets?: IExtraSet[];
+    // Legacy fields (backward compatible)
     listeningSetId?: Types.ObjectId;
     listeningSetNumber?: number;
     listeningSetNumbers?: number[];
@@ -169,6 +188,10 @@ export interface ICreateStudentInput {
     paymentDate?: Date;
     paymentReference?: string;
     examDate: Date;
+    // Full Sets (new)
+    fullSets?: IFullSet[];
+    extraSets?: IExtraSet[];
+    // Legacy fields
     listeningSetNumber?: number;
     listeningSetNumbers?: number[];
     readingSetNumber?: number;

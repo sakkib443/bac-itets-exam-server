@@ -36,6 +36,18 @@ const createStudentSchema = z.object({
         examDate: z
             .string({ message: "Exam date is required" })
             .datetime("Invalid date format"),
+        // Full Sets (new grouped L+R+W)
+        fullSets: z.array(z.object({
+            label: z.string().optional(),
+            listeningSetNumber: z.number().int().min(1).max(10000).optional(),
+            readingSetNumber: z.number().int().min(1).max(10000).optional(),
+            writingSetNumber: z.number().int().min(1).max(10000).optional(),
+        })).optional(),
+        extraSets: z.array(z.object({
+            module: z.string(),
+            setNumber: z.number().int().min(1).max(10000),
+        })).optional(),
+        // Legacy fields
         listeningSetNumber: z.number().int().min(1).max(10000).optional(),
         listeningSetNumbers: z.array(z.number().int().min(1).max(10000)).optional(),
         readingSetNumber: z.number().int().min(1).max(10000).optional(),
