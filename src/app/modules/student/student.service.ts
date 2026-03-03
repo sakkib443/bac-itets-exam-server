@@ -260,32 +260,68 @@ const updateStudent = async (id: string, updateData: Partial<ICreateStudentInput
         updateObj.paymentDate = new Date(updateData.paymentDate);
     }
 
-    // Handle assigned sets - single values
-    if (updateData.listeningSetNumber !== undefined) {
-        updateObj["assignedSets.listeningSetNumber"] = updateData.listeningSetNumber;
-    }
-    if (updateData.readingSetNumber !== undefined) {
-        updateObj["assignedSets.readingSetNumber"] = updateData.readingSetNumber;
-    }
-    if (updateData.writingSetNumber !== undefined) {
-        updateObj["assignedSets.writingSetNumber"] = updateData.writingSetNumber;
-    }
-    if ((updateData as any).speakingSetNumber !== undefined) {
-        updateObj["assignedSets.speakingSetNumber"] = (updateData as any).speakingSetNumber;
-    }
+    // Handle assigned sets — Full Sets (new) or legacy fields
+    const inputFullSets = (updateData as any).fullSets;
+    const inputExtraSets = (updateData as any).extraSets;
 
-    // Handle assigned sets - multi-set arrays
-    if ((updateData as any).listeningSetNumbers !== undefined) {
-        updateObj["assignedSets.listeningSetNumbers"] = (updateData as any).listeningSetNumbers;
-    }
-    if ((updateData as any).readingSetNumbers !== undefined) {
-        updateObj["assignedSets.readingSetNumbers"] = (updateData as any).readingSetNumbers;
-    }
-    if ((updateData as any).writingSetNumbers !== undefined) {
-        updateObj["assignedSets.writingSetNumbers"] = (updateData as any).writingSetNumbers;
-    }
-    if ((updateData as any).speakingSetNumbers !== undefined) {
-        updateObj["assignedSets.speakingSetNumbers"] = (updateData as any).speakingSetNumbers;
+    if (inputFullSets || inputExtraSets) {
+        // New Full Set format — rebuild everything
+        const fullSets = inputFullSets || [];
+        const extraSets = inputExtraSets || [];
+
+        const listeningNums: number[] = [];
+        const readingNums: number[] = [];
+        const writingNums: number[] = [];
+
+        fullSets.forEach((fs: any, idx: number) => {
+            if (!fs.label) fs.label = `Full Set ${idx + 1}`;
+            if (fs.listeningSetNumber) listeningNums.push(fs.listeningSetNumber);
+            if (fs.readingSetNumber) readingNums.push(fs.readingSetNumber);
+            if (fs.writingSetNumber) writingNums.push(fs.writingSetNumber);
+        });
+
+        extraSets.forEach((es: any) => {
+            if (es.module === 'listening' && es.setNumber) listeningNums.push(es.setNumber);
+            if (es.module === 'reading' && es.setNumber) readingNums.push(es.setNumber);
+            if (es.module === 'writing' && es.setNumber) writingNums.push(es.setNumber);
+        });
+
+        updateObj["assignedSets.fullSets"] = fullSets.length > 0 ? fullSets : [];
+        updateObj["assignedSets.extraSets"] = extraSets.length > 0 ? extraSets : [];
+        updateObj["assignedSets.listeningSetNumber"] = listeningNums[0] || updateData.listeningSetNumber;
+        updateObj["assignedSets.listeningSetNumbers"] = listeningNums.length > 0 ? listeningNums : [];
+        updateObj["assignedSets.readingSetNumber"] = readingNums[0] || updateData.readingSetNumber;
+        updateObj["assignedSets.readingSetNumbers"] = readingNums.length > 0 ? readingNums : [];
+        updateObj["assignedSets.writingSetNumber"] = writingNums[0] || updateData.writingSetNumber;
+        updateObj["assignedSets.writingSetNumbers"] = writingNums.length > 0 ? writingNums : [];
+    } else {
+        // Legacy field updates
+        if (updateData.listeningSetNumber !== undefined) {
+            updateObj["assignedSets.listeningSetNumber"] = updateData.listeningSetNumber;
+        }
+        if (updateData.readingSetNumber !== undefined) {
+            updateObj["assignedSets.readingSetNumber"] = updateData.readingSetNumber;
+        }
+        if (updateData.writingSetNumber !== undefined) {
+            updateObj["assignedSets.writingSetNumber"] = updateData.writingSetNumber;
+        }
+        if ((updateData as any).speakingSetNumber !== undefined) {
+            updateObj["assignedSets.speakingSetNumber"] = (updateData as any).speakingSetNumber;
+        }
+
+        // Handle assigned sets - multi-set arrays
+        if ((updateData as any).listeningSetNumbers !== undefined) {
+            updateObj["assignedSets.listeningSetNumbers"] = (updateData as any).listeningSetNumbers;
+        }
+        if ((updateData as any).readingSetNumbers !== undefined) {
+            updateObj["assignedSets.readingSetNumbers"] = (updateData as any).readingSetNumbers;
+        }
+        if ((updateData as any).writingSetNumbers !== undefined) {
+            updateObj["assignedSets.writingSetNumbers"] = (updateData as any).writingSetNumbers;
+        }
+        if ((updateData as any).speakingSetNumbers !== undefined) {
+            updateObj["assignedSets.speakingSetNumbers"] = (updateData as any).speakingSetNumbers;
+        }
     }
 
     // Remove individual set fields from root
@@ -297,6 +333,8 @@ const updateStudent = async (id: string, updateData: Partial<ICreateStudentInput
     delete (updateObj as any).readingSetNumbers;
     delete (updateObj as any).writingSetNumbers;
     delete (updateObj as any).speakingSetNumbers;
+    delete (updateObj as any).fullSets;
+    delete (updateObj as any).extraSets;
 
     const updatedStudent = await Student.findByIdAndUpdate(
         id,
