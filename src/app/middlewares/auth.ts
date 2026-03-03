@@ -65,7 +65,10 @@ export const authorize = (...roles: string[]) => {
             });
         }
 
-        if (!roles.includes(req.user.role)) {
+        // super-admin has all admin permissions too
+        const effectiveRoles = roles.includes("admin") ? [...roles, "super-admin"] : roles;
+
+        if (!effectiveRoles.includes(req.user.role)) {
             return res.status(403).json({
                 success: false,
                 message: "You do not have permission to perform this action",

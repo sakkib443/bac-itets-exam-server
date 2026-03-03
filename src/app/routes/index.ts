@@ -4,6 +4,7 @@ import { ExamRoutes } from "../modules/exam/exam.route";
 import { ExamSessionRoutes } from "../modules/examSession/examSession.route";
 import { StudentRoutes } from "../modules/student/student.route";
 import { UploadRoutes } from "../modules/upload/upload.route";
+import { UserRoutes } from "../modules/user/user.route";
 
 // Separate modules for each exam type
 import { ListeningRoutes } from "../modules/listening/listening.route";
@@ -50,6 +51,10 @@ const moduleRoutes = [
     {
         path: "/speaking",
         route: SpeakingRoutes,
+    },
+    {
+        path: "/users",
+        route: UserRoutes,
     },
 ];
 
