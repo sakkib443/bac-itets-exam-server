@@ -560,6 +560,8 @@ const resetExam = async (examId: string) => {
     student.totalViolations = 0;
     student.scores = undefined;
     student.canRetake = true;
+    student.completedModules = [];
+    student.examAnswers = undefined;
 
     await student.save();
 
@@ -1696,16 +1698,8 @@ const resetModule = async (
         throw new Error("Failed to reset module");
     }
 
-    return {
-        _id: updatedStudent._id,
-        examId: updatedStudent.examId,
-        nameEnglish: updatedStudent.nameEnglish,
-        module,
-        completedModules: updatedStudent.completedModules,
-        examStatus: updatedStudent.examStatus,
-        scores: updatedStudent.scores,
-        message: `${module} module reset successfully. Student can now retake this module.`,
-    };
+    // Return the full student object so frontend can update state properly
+    return updatedStudent;
 };
 
 const getStudentByEmail = async (email: string) => {
